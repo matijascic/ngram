@@ -3,3 +3,4 @@ launch.json
 datasets/
 .vscode
 __pycache__
+*.mp4

@@ -13,10 +13,10 @@ import dataset as ds
 
 if __name__ == "__main__":
 
-    LANG="de"
+    LANG="lat"
     data = ds.load_dataset(LANG)
 
-    N = 2
+    N = 5
 
     # n-gram counts
     ngram = {}
@@ -79,9 +79,19 @@ if __name__ == "__main__":
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
         return ch
 
-    # interactive next token suggestion
+# interactive next token suggestion
     cols = os.get_terminal_size().columns
-    print('\n' * 5)
+    rows = os.get_terminal_size().lines
+
+    # clear screen
+    print('\033[2J\033[H', end='', flush=True)
+
+    # draw header
+    print('=' * cols)
+    print(f'  N-GRAM TEXT MODEL  |  lang={LANG}  |  N={N}  |  ESC to generate')
+    print('=' * cols)
+    print()
+
     prompt = " " * (N - 1)
     while True:
         context = prompt[-(N - 1):]
@@ -89,7 +99,11 @@ if __name__ == "__main__":
         top5 = dict(sorted(candidates.items(), key=lambda x: -x[1])[:5])
 
         top_str = "  ".join(f"{k.split('|')[0]}: {v:.2f}" for k, v in top5.items())
-        print('\r' + prompt + "| " + top_str + ' ' * (cols - len(prompt) - len(top_str) - 3), end='', flush=True)
+
+        # cursor to line 5: prompt
+        print(f'\033[5;1H\033[K  > {prompt}\u2588', flush=True)
+        # cursor to line 7: predictions
+        print(f'\033[7;1H\033[K  next: {top_str}', end='', flush=True)
 
         val = get_char()
 
@@ -103,21 +117,34 @@ if __name__ == "__main__":
             continue
 
     # auto generation
-    print('\n\n--- Auto generation ---\n')
+    print('\033[2J\033[H', end='', flush=True)
+    input()
+    print('=' * cols)
+    print(f'  AUTO GENERATION  |  lang={LANG}  |  N={N}')
+    print('=' * cols)
+    print()
+
     start = random.choice(list(totals.keys()))
     text = start
-    print(start, end='', flush=True)
+    print('  ' + start, end='', flush=True)
+    line_len = len(start) + 2
     while True:
         context = text[-(N - 1):]
         candidates = {k: v for k, v in prob.items() if k.split('|')[1] == context}
         if not candidates:
             text += ' '
             print(' ', end='', flush=True)
+            line_len += 1
             continue
         keys = list(candidates.keys())
         weights = list(candidates.values())
         chosen = random.choices(keys, weights=weights, k=1)[0]
         char = chosen.split('|')[0]
         text += char
+        # wrap lines nicely
+        if line_len >= cols - 4:
+            print('\n  ', end='', flush=True)
+            line_len = 2
         print(char, end='', flush=True)
-        time.sleep(0.05)
+        line_len += 1
+        time.sleep(0.03)
