@@ -5,5 +5,8 @@ import os
 
 if __name__ == "__main__":
 
-    files = os.listdir("shakespire-dataset")
+    DIR="./shakespeare-dataset/"
+    rel_path_files = [DIR+file for file in os.listdir(DIR)]
+    print(rel_path_files)
+
     
