@@ -6,6 +6,9 @@ import re
 DATASETS = {
     "en": "./datasets/english/",
     "fr": "./datasets/french/",
+    "de": "./datasets/german/",
+    "es": "./datasets/spanish/",
+    "lat": "./datasets/latin/",
 }
 
 def strip_html(text):

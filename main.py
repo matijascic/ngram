@@ -13,9 +13,10 @@ import dataset as ds
 
 if __name__ == "__main__":
 
-    data = ds.load_dataset("jp")
+    LANG="de"
+    data = ds.load_dataset(LANG)
 
-    N = 4
+    N = 2
 
     # n-gram counts
     ngram = {}
@@ -40,6 +41,33 @@ if __name__ == "__main__":
         prob[key] = count / totals[context]
 
     print(f"Loaded {len(prob)} probabilities")
+
+
+    # heatmap for bigram
+    if N == 2:
+        chars = sorted(set(c for key in ngram for c in key.split('|')))
+        size = len(chars)
+        char_to_idx = {c: i for i, c in enumerate(chars)}
+
+        matrix = np.zeros((size, size))
+        for key, count in ngram.items():
+            c1, c2 = key.split('|')
+            matrix[char_to_idx[c1]][char_to_idx[c2]] = count
+
+        row_sums = matrix.sum(axis=0, keepdims=True)
+        pmatrix = np.divide(matrix, row_sums, where=row_sums != 0, out=np.zeros_like(matrix))
+
+        plt.figure(figsize=(12, 10))
+        plt.imshow(pmatrix, cmap='hot')
+        plt.xticks(range(size), chars)
+        plt.yticks(range(size), chars)
+        plt.xlabel('given char')
+        plt.ylabel('next char')
+        plt.colorbar(label='probability')
+        plt.title('Bigram probability distribution')
+        plt.tight_layout()
+        plt.savefig("./heatmap/"+LANG+".png", dpi=150)
+        print("Saved heatmap.")
 
     def get_char():
         fd = sys.stdin.fileno()
