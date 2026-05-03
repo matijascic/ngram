@@ -31,24 +31,6 @@ python main.py
 
 Change lang and N at the top of `main.py`.
 
-## Bigram probability heatmaps
-
-When N=2, the model saves a heatmap of the probability matrix.
-
-We can see that latin languages share similar adjacency matrix patterns like q followed by u, th in english, etc.
-
-### English
-![English bigram heatmap](assets/heatmap/en.png)
-
-### French
-![French bigram heatmap](assets/heatmap/fr.png)
-
-### German
-![German bigram heatmap](assets/heatmap/de.png)
-
-### Latin
-![Latin bigram heatmap](assets/heatmap/lat.png)
-
 ## Datasets
 
 All the datasets links in the script may be broken but were functional [2026-05-03].
