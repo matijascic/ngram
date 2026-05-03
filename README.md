@@ -38,16 +38,16 @@ When N=2, the model saves a heatmap of the probability matrix.
 We can see that latin languages share similar adjacency matrix patterns like q followed by u, th in english, etc.
 
 ### English
-![English bigram heatmap](heatmap/en.png)
+![English bigram heatmap](assets/heatmap/en.png)
 
 ### French
-![French bigram heatmap](heatmap/fr.png)
+![French bigram heatmap](assets/heatmap/fr.png)
 
 ### German
-![German bigram heatmap](heatmap/de.png)
+![German bigram heatmap](assets/heatmap/de.png)
 
 ### Latin
-![Latin bigram heatmap](heatmap/lat.png)
+![Latin bigram heatmap](assets/heatmap/lat.png)
 
 ## Datasets
 
