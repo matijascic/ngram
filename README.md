@@ -1,1 +1,2 @@
-Simple ngram text-prediction model
+Simple ngram text generation model on different languages
+

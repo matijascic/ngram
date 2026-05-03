@@ -1,2 +1,5 @@
 venv
 launch.json
+datasets/
+.vscode
+__pycache__

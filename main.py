@@ -9,37 +9,24 @@ import time
 matplotlib.use("Qt5Agg")
 import matplotlib.pyplot as plt
 
+import dataset as ds
+
 if __name__ == "__main__":
 
-    DIR = "./shakespeare-dataset/"
+    data = ds.load_dataset("jp")
+
     N = 4
-
-    dataset = {}
-
-    for name in os.listdir(DIR):
-        dataset[name] = {}
-        dataset[name]["title"] = name
-        dataset[name]["path"] = DIR + name
-        print(dataset[name])
-        f = open(dataset[name]["path"], 'r')
-        dataset[name]["content"] = f.read()
-        f.close()
-
-    for data in dataset.keys():
-        content = dataset[data]["content"]
-        content = content.replace('\n', ' ')
-        content = ''.join(c for c in content if c.isalpha() or c == ' ')
-        content = content.lower()
-        dataset[data]["content"] = " " + content + " "
 
     # n-gram counts
     ngram = {}
-    for data in dataset.keys():
-        content = dataset[data]["content"]
+    for name in data.keys():
+        content = data[name]["content"]
         for i in range(N - 1, len(content)):
             context = content[i - N + 1:i]
             key = content[i] + "|" + context
             ngram[key] = ngram.get(key, 0) + 1
+
+    print(f"Built {len(ngram)} n-grams")
 
     # normalize to probabilities
     totals = {}
@@ -51,6 +38,8 @@ if __name__ == "__main__":
     for key, count in ngram.items():
         context = key.split('|')[1]
         prob[key] = count / totals[context]
+
+    print(f"Loaded {len(prob)} probabilities")
 
     def get_char():
         fd = sys.stdin.fileno()
@@ -68,7 +57,7 @@ if __name__ == "__main__":
     prompt = " " * (N - 1)
     while True:
         context = prompt[-(N - 1):]
-        candidates = {k: v for k, v in prob.items() if k.endswith('|' + context)}
+        candidates = {k: v for k, v in prob.items() if k.split('|')[1] == context}
         top5 = dict(sorted(candidates.items(), key=lambda x: -x[1])[:5])
 
         top_str = "  ".join(f"{k.split('|')[0]}: {v:.2f}" for k, v in top5.items())
@@ -86,13 +75,17 @@ if __name__ == "__main__":
             continue
 
     # auto generation
-    print('\n')
-    text = " " * (N - 1)
+    print('\n\n--- Auto generation ---\n')
+    start = random.choice(list(totals.keys()))
+    text = start
+    print(start, end='', flush=True)
     while True:
         context = text[-(N - 1):]
-        candidates = {k: v for k, v in prob.items() if k.endswith('|' + context)}
+        candidates = {k: v for k, v in prob.items() if k.split('|')[1] == context}
         if not candidates:
-            break
+            text += ' '
+            print(' ', end='', flush=True)
+            continue
         keys = list(candidates.keys())
         weights = list(candidates.values())
         chosen = random.choices(keys, weights=weights, k=1)[0]
